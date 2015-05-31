@@ -28,6 +28,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class Searcher {
     
     private static final String KEYWORD = "search.keyword";
+    private static final String MINIMUM = "search.minimum";
     
     public static class TokenizerMapper
     extends Mapper<Object, Text, Text, IntWritable>{
@@ -63,6 +64,13 @@ public class Searcher {
     public static class IntSumReducer
     extends Reducer<Text,IntWritable,Text,IntWritable> {
         private IntWritable result = new IntWritable();
+        private int min;
+        
+        @Override
+        protected void setup(Context context
+        ) throws IOException, InterruptedException {
+            min = Integer.valueOf(context.getConfiguration().get(MINIMUM));
+        }
         
         @Override
         public void reduce(Text key, Iterable<IntWritable> values,
@@ -72,6 +80,7 @@ public class Searcher {
             for (IntWritable val : values) {
                 sum += val.get();
             }
+            if (sum < min)  return;
             result.set(sum);
             context.write(key, result);
         }
@@ -91,6 +100,7 @@ public class Searcher {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
         System.out.print("Please input a keyword:\t");
         conf.set(KEYWORD, in.readLine());
+        conf.set(MINIMUM, args[2]);
         
         Job job = Job.getInstance(conf, "keyword search");
         
@@ -129,7 +139,7 @@ public class Searcher {
         for (Map.Entry<String, Integer> entry:list) {
             in = new BufferedReader(new InputStreamReader(FileSystem.get(conf).open(new Path(entry.getKey())), "UTF-8"));
             System.out.println("\n" + in.readLine());
-            System.out.println("\n" + in.readLine() + "\n");
+            System.out.println("\n" + in.readLine() + ":" + entry.getValue() + "\n");
         }
     }
 }
