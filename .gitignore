@@ -1,0 +1,4 @@
+*.jar
+*.class
+parser/target
+searcher/target
