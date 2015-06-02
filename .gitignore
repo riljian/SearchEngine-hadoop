@@ -1,4 +1,4 @@
-*.jar
-*.class
-parser/target
-searcher/target
+/parser/target
+/searcher_mapreduce/target/
+/searcher_hbase/target/
+/movehdfstohbase/target/
