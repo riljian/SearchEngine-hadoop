@@ -23,7 +23,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 /**
  *
- * @author User
+ * @author ril
  */
 public class Searcher {
 
